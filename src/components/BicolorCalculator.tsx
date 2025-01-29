@@ -97,7 +97,16 @@ const BicolorCalculator = () => {
             <TableBody>
               {calculations.map((calc) => (
                 <TableRow key={calc.itemId}>
-                  <TableCell className="font-medium">{calc.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <a
+                      href={`https://universalis.app/market/${calc.itemId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-ffxiv-gold hover:underline"
+                    >
+                      {calc.name}
+                    </a>
+                  </TableCell>
                   <TableCell className="text-right">{calc.cost}</TableCell>
                   <TableCell className="text-right">
                     {calc.marketPrice.toLocaleString()} gil
