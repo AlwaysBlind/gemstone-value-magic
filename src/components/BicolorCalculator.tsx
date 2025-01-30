@@ -23,6 +23,10 @@ import { Loader2 } from "lucide-react";
 
 const servers = ["Twintania", "Phoenix", "Odin", "Lich", "Zodiark", "Ragnarok", "Cerberus", "Spriggan", "Alpha", "Raiden"];
 
+const formatNumber = (num: number): string => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+};
+
 const BicolorCalculator = () => {
   const [selectedServer, setSelectedServer] = useState("Twintania");
 
@@ -57,7 +61,6 @@ const BicolorCalculator = () => {
           };
         }
         
-        // Calculate average price from recent sales
         const recentSales = itemMarketData.entries;
         console.log(`Found ${recentSales.length} sales for ${item.name}`);
         
@@ -139,10 +142,10 @@ const BicolorCalculator = () => {
                   </TableCell>
                   <TableCell className="text-right">{calc.cost}</TableCell>
                   <TableCell className="text-right">
-                    {Math.round(calc.marketPrice).toLocaleString()} gil
+                    {formatNumber(Math.round(calc.marketPrice))} gil
                   </TableCell>
                   <TableCell className="text-right">
-                    {Math.round(calc.gilPerGem).toLocaleString()} gil
+                    {formatNumber(Math.round(calc.gilPerGem))} gil
                   </TableCell>
                   <TableCell className="text-right">
                     {calc.saleVelocity.toFixed(1)}/day
