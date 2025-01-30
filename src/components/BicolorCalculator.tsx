@@ -30,6 +30,7 @@ const BicolorCalculator = () => {
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
+      console.log("Fetching market data for items:", itemIds);
       const data = await fetchMarketData(selectedServer, itemIds);
       console.log("Raw market data received:", data);
       return data;
@@ -42,10 +43,10 @@ const BicolorCalculator = () => {
     return bicolorItems
       .map((item) => {
         const itemMarketData = marketData.items[item.id];
-        console.log(`Calculating price for ${item.name} (ID: ${item.id}):`, itemMarketData);
+        console.log(`Processing item ${item.name} (ID: ${item.id})`);
         
-        if (!itemMarketData) {
-          console.log(`No market data found for ${item.name}`);
+        if (!itemMarketData || !itemMarketData.entries) {
+          console.log(`No valid market data found for ${item.name}`);
           return {
             itemId: item.id,
             name: item.name,
@@ -57,17 +58,20 @@ const BicolorCalculator = () => {
         }
         
         // Calculate average price from recent sales
-        const recentSales = itemMarketData.entries || [];
-        console.log(`Found ${recentSales.length} recent sales for ${item.name}`);
+        const recentSales = itemMarketData.entries;
+        console.log(`Found ${recentSales.length} sales for ${item.name}`);
         
-        const averagePrice = recentSales.length > 0
-          ? recentSales.reduce((sum, sale) => {
-              console.log(`Sale price for ${item.name}: ${sale.pricePerUnit} x ${sale.quantity}`);
-              return sum + sale.pricePerUnit;
-            }, 0) / recentSales.length
-          : 0;
+        let totalPrice = 0;
+        let totalQuantity = 0;
         
-        console.log(`Final average price for ${item.name}: ${averagePrice}`);
+        recentSales.forEach(sale => {
+          console.log(`Sale for ${item.name}: ${sale.pricePerUnit} gil x ${sale.quantity} units`);
+          totalPrice += sale.pricePerUnit * sale.quantity;
+          totalQuantity += sale.quantity;
+        });
+        
+        const averagePrice = totalQuantity > 0 ? totalPrice / totalQuantity : 0;
+        console.log(`Final average price for ${item.name}: ${averagePrice} gil (total quantity: ${totalQuantity})`);
 
         return {
           itemId: item.id,

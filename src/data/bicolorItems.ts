@@ -372,11 +372,6 @@ export const bicolorItems: BicolorItem[] = [
     "cost": 100
   },
   {
-    "id": 35833,
-    "name": "Bicolor Gemstone Voucher",
-    "cost": 100
-  },
-  {
     "id": 44053,
     "name": "Silver Lobo Hide",
     "cost": 3
@@ -505,11 +500,6 @@ export const bicolorItems: BicolorItem[] = [
     "id": 44113,
     "name": "Tuliyollan Table Lamp",
     "cost": 150
-  },
-  {
-    "id": 43961,
-    "name": "Turali Bicolor Gemstone Voucher",
-    "cost": 100
   },
   {
     "id": 44116,
