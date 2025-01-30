@@ -57,10 +57,10 @@ const BicolorCalculator = () => {
     return bicolorItems
       .map((item) => {
         const itemMarketData = marketData.items[item.id];
-        console.log(`Processing item ${item.name} (ID: ${item.id})`);
         
         if (!itemMarketData || !itemMarketData.entries) {
-          console.log(`No valid market data found for ${item.name}`);
+          console.log(`No market data found for ${item.name} (ID: ${item.id})`);
+          console.log('Market data object:', itemMarketData);
           return {
             itemId: item.id,
             name: item.name,
@@ -72,19 +72,26 @@ const BicolorCalculator = () => {
         }
         
         const recentSales = itemMarketData.entries;
-        console.log(`Found ${recentSales.length} sales for ${item.name}`);
+        if (recentSales.length === 0) {
+          console.log(`No sales history found for ${item.name} (ID: ${item.id})`);
+        } else {
+          console.log(`Found ${recentSales.length} sales for ${item.name}`);
+          console.log('Most recent sale:', recentSales[0]);
+          console.log('Oldest sale in dataset:', recentSales[recentSales.length - 1]);
+        }
         
         let totalPrice = 0;
         let totalQuantity = 0;
         
         recentSales.forEach(sale => {
-          console.log(`Sale for ${item.name}: ${sale.pricePerUnit} gil x ${sale.quantity} units`);
           totalPrice += sale.pricePerUnit * sale.quantity;
           totalQuantity += sale.quantity;
         });
         
         const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
-        console.log(`Final average price for ${item.name}: ${averagePrice} gil (total quantity: ${totalQuantity})`);
+        if (averagePrice === 0) {
+          console.log(`Zero average price calculated for ${item.name} - Total Price: ${totalPrice}, Total Quantity: ${totalQuantity}`);
+        }
 
         return {
           itemId: item.id,
