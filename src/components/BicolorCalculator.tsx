@@ -70,7 +70,7 @@ const BicolorCalculator = () => {
           totalQuantity += sale.quantity;
         });
         
-        const averagePrice = totalQuantity > 0 ? totalPrice / totalQuantity : 0;
+        const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
         console.log(`Final average price for ${item.name}: ${averagePrice} gil (total quantity: ${totalQuantity})`);
 
         return {
@@ -78,7 +78,7 @@ const BicolorCalculator = () => {
           name: item.name,
           cost: item.cost,
           marketPrice: averagePrice,
-          gilPerGem: averagePrice / item.cost,
+          gilPerGem: Math.round(averagePrice / item.cost),
           saleVelocity: itemMarketData.regularSaleVelocity || 0,
         };
       })
@@ -139,10 +139,10 @@ const BicolorCalculator = () => {
                   </TableCell>
                   <TableCell className="text-right">{calc.cost}</TableCell>
                   <TableCell className="text-right">
-                    {calc.marketPrice.toLocaleString()} gil
+                    {Math.round(calc.marketPrice).toLocaleString()} gil
                   </TableCell>
                   <TableCell className="text-right">
-                    {calc.gilPerGem.toLocaleString()} gil
+                    {Math.round(calc.gilPerGem).toLocaleString()} gil
                   </TableCell>
                   <TableCell className="text-right">
                     {calc.saleVelocity.toFixed(1)}/day
