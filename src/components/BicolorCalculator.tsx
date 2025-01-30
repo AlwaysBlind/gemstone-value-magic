@@ -19,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 const servers = ["Twintania", "Phoenix", "Odin", "Lich", "Zodiark", "Ragnarok", "Cerberus", "Spriggan", "Alpha", "Raiden"];
 
@@ -27,8 +28,17 @@ const formatNumber = (num: number): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
 };
 
+type SortConfig = {
+  key: keyof PriceCalculation;
+  direction: 'asc' | 'desc';
+};
+
 const BicolorCalculator = () => {
   const [selectedServer, setSelectedServer] = useState("Twintania");
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ 
+    key: 'gilPerGem', 
+    direction: 'desc' 
+  });
 
   const { data: marketData, isLoading } = useQuery({
     queryKey: ["marketData", selectedServer],
@@ -84,11 +94,42 @@ const BicolorCalculator = () => {
           gilPerGem: Math.round(averagePrice / item.cost),
           saleVelocity: itemMarketData.regularSaleVelocity || 0,
         };
-      })
-      .sort((a, b) => b.gilPerGem - a.gilPerGem);
+      });
   };
 
-  const calculations = calculatePrices();
+  const sortData = (data: PriceCalculation[]): PriceCalculation[] => {
+    return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+      
+      if (sortConfig.direction === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      }
+      return aValue < bValue ? 1 : -1;
+    });
+  };
+
+  const handleSort = (key: keyof PriceCalculation) => {
+    setSortConfig((currentConfig) => ({
+      key,
+      direction:
+        currentConfig.key === key && currentConfig.direction === 'desc'
+          ? 'asc'
+          : 'desc',
+    }));
+  };
+
+  const calculations = sortData(calculatePrices());
+
+  const SortButton = ({ column }: { column: keyof PriceCalculation }) => (
+    <Button
+      variant="ghost"
+      onClick={() => handleSort(column)}
+      className="h-8 px-2 lg:px-3"
+    >
+      <ArrowUpDown className="ml-2 h-4 w-4" />
+    </Button>
+  );
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-ffxiv-blue text-white">
@@ -120,11 +161,26 @@ const BicolorCalculator = () => {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-ffxiv-gold">Item</TableHead>
-                <TableHead className="text-ffxiv-gold text-right">Cost (Gems)</TableHead>
-                <TableHead className="text-ffxiv-gold text-right">Market Price</TableHead>
-                <TableHead className="text-ffxiv-gold text-right">Gil per Gem</TableHead>
-                <TableHead className="text-ffxiv-gold text-right">Sale Velocity</TableHead>
+                <TableHead className="text-ffxiv-gold">
+                  Item
+                  <SortButton column="name" />
+                </TableHead>
+                <TableHead className="text-ffxiv-gold text-right">
+                  Cost (Gems)
+                  <SortButton column="cost" />
+                </TableHead>
+                <TableHead className="text-ffxiv-gold text-right">
+                  Market Price
+                  <SortButton column="marketPrice" />
+                </TableHead>
+                <TableHead className="text-ffxiv-gold text-right">
+                  Gil per Gem
+                  <SortButton column="gilPerGem" />
+                </TableHead>
+                <TableHead className="text-ffxiv-gold text-right">
+                  Sale Velocity
+                  <SortButton column="saleVelocity" />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
