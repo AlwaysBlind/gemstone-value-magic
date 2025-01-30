@@ -40,11 +40,20 @@ const BicolorCalculator = () => {
     return bicolorItems
       .map((item) => {
         const itemMarketData = marketData.items[item.id];
+        console.log(`Calculating price for ${item.name} (ID: ${item.id}):`, itemMarketData);
+        
         // Calculate average price from recent sales
         const recentSales = itemMarketData?.entries?.slice(0, 10) || [];
+        console.log(`Recent sales for ${item.name}:`, recentSales);
+        
         const averagePrice = recentSales.length > 0
-          ? recentSales.reduce((sum, sale) => sum + sale.pricePerUnit, 0) / recentSales.length
+          ? recentSales.reduce((sum, sale) => {
+              console.log(`Sale price for ${item.name}: ${sale.pricePerUnit} x ${sale.quantity}`);
+              return sum + sale.pricePerUnit;
+            }, 0) / recentSales.length
           : 0;
+        
+        console.log(`Final average price for ${item.name}: ${averagePrice}`);
 
         return {
           itemId: item.id,
