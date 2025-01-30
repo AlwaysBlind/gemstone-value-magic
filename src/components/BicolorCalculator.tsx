@@ -65,7 +65,7 @@ const BicolorCalculator = () => {
             itemId: item.id,
             name: item.name,
             cost: item.cost,
-            marketPrice: 0,
+            marketPrice: -1, // Use -1 to indicate no data available
             gilPerGem: 0,
             saleVelocity: 0,
           };
@@ -74,10 +74,14 @@ const BicolorCalculator = () => {
         const recentSales = itemMarketData.entries;
         if (recentSales.length === 0) {
           console.log(`No sales history found for ${item.name} (ID: ${item.id})`);
-        } else {
-          console.log(`Found ${recentSales.length} sales for ${item.name}`);
-          console.log('Most recent sale:', recentSales[0]);
-          console.log('Oldest sale in dataset:', recentSales[recentSales.length - 1]);
+          return {
+            itemId: item.id,
+            name: item.name,
+            cost: item.cost,
+            marketPrice: 0, // Use 0 to indicate no sales
+            gilPerGem: 0,
+            saleVelocity: 0,
+          };
         }
         
         let totalPrice = 0;
@@ -89,9 +93,6 @@ const BicolorCalculator = () => {
         });
         
         const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
-        if (averagePrice === 0) {
-          console.log(`Zero average price calculated for ${item.name} - Total Price: ${totalPrice}, Total Quantity: ${totalQuantity}`);
-        }
 
         return {
           itemId: item.id,
@@ -127,6 +128,17 @@ const BicolorCalculator = () => {
   };
 
   const calculations = sortData(calculatePrices());
+
+  const formatMarketPrice = (calculation: PriceCalculation): string => {
+    if (calculation.marketPrice === -1) return "No data available";
+    if (calculation.marketPrice === 0) return "No recent sales";
+    return `${formatNumber(Math.round(calculation.marketPrice))} gil`;
+  };
+
+  const formatGilPerGem = (calculation: PriceCalculation): string => {
+    if (calculation.marketPrice <= 0) return "-";
+    return `${formatNumber(Math.round(calculation.gilPerGem))} gil`;
+  };
 
   const SortButton = ({ column }: { column: keyof PriceCalculation }) => (
     <Button
@@ -205,10 +217,10 @@ const BicolorCalculator = () => {
                   </TableCell>
                   <TableCell className="text-right">{calc.cost}</TableCell>
                   <TableCell className="text-right">
-                    {formatNumber(Math.round(calc.marketPrice))} gil
+                    {formatMarketPrice(calc)}
                   </TableCell>
                   <TableCell className="text-right">
-                    {formatNumber(Math.round(calc.gilPerGem))} gil
+                    {formatGilPerGem(calc)}
                   </TableCell>
                   <TableCell className="text-right">
                     {calc.saleVelocity.toFixed(1)}/day
