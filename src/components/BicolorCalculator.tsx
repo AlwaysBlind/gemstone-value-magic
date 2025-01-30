@@ -40,16 +40,19 @@ const BicolorCalculator = () => {
     return bicolorItems
       .map((item) => {
         const itemMarketData = marketData.items[item.id];
-        const marketPrice = itemMarketData?.currentAveragePriceNQ || 0;
-        const saleVelocity = itemMarketData?.regularSaleVelocity || 0;
+        // Calculate average price from recent sales
+        const recentSales = itemMarketData?.entries?.slice(0, 10) || [];
+        const averagePrice = recentSales.length > 0
+          ? recentSales.reduce((sum, sale) => sum + sale.pricePerUnit, 0) / recentSales.length
+          : 0;
 
         return {
           itemId: item.id,
           name: item.name,
           cost: item.cost,
-          marketPrice,
-          gilPerGem: marketPrice / item.cost,
-          saleVelocity,
+          marketPrice: averagePrice,
+          gilPerGem: averagePrice / item.cost,
+          saleVelocity: itemMarketData?.regularSaleVelocity || 0,
         };
       })
       .sort((a, b) => b.gilPerGem - a.gilPerGem);

@@ -4,12 +4,28 @@ export interface BicolorItem {
   cost: number;
 }
 
-export interface MarketData {
-  currentAveragePriceNQ: number;
-  currentAveragePriceHQ: number;
+export interface MarketHistoryEntry {
+  hq: boolean;
+  pricePerUnit: number;
+  quantity: number;
+  timestamp: number;
+  buyerName: string;
+  onMannequin: boolean;
+}
+
+export interface MarketHistoryData {
+  itemID: number;
+  lastUploadTime: number;
+  entries: MarketHistoryEntry[];
   regularSaleVelocity: number;
   nqSaleVelocity: number;
   hqSaleVelocity: number;
+  worldName: string;
+}
+
+export interface MarketHistoryResponse {
+  items: { [key: string]: MarketHistoryData };
+  worldName: string;
 }
 
 export interface PriceCalculation {
