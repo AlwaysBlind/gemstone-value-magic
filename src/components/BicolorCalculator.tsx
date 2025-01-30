@@ -30,7 +30,9 @@ const BicolorCalculator = () => {
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
-      return fetchMarketData(selectedServer, itemIds);
+      const data = await fetchMarketData(selectedServer, itemIds);
+      console.log("Raw market data received:", data);
+      return data;
     },
   });
 
@@ -42,9 +44,21 @@ const BicolorCalculator = () => {
         const itemMarketData = marketData.items[item.id];
         console.log(`Calculating price for ${item.name} (ID: ${item.id}):`, itemMarketData);
         
+        if (!itemMarketData) {
+          console.log(`No market data found for ${item.name}`);
+          return {
+            itemId: item.id,
+            name: item.name,
+            cost: item.cost,
+            marketPrice: 0,
+            gilPerGem: 0,
+            saleVelocity: 0,
+          };
+        }
+        
         // Calculate average price from recent sales
-        const recentSales = itemMarketData?.entries?.slice(0, 10) || [];
-        console.log(`Recent sales for ${item.name}:`, recentSales);
+        const recentSales = itemMarketData.entries || [];
+        console.log(`Found ${recentSales.length} recent sales for ${item.name}`);
         
         const averagePrice = recentSales.length > 0
           ? recentSales.reduce((sum, sale) => {
@@ -61,7 +75,7 @@ const BicolorCalculator = () => {
           cost: item.cost,
           marketPrice: averagePrice,
           gilPerGem: averagePrice / item.cost,
-          saleVelocity: itemMarketData?.regularSaleVelocity || 0,
+          saleVelocity: itemMarketData.regularSaleVelocity || 0,
         };
       })
       .sort((a, b) => b.gilPerGem - a.gilPerGem);
