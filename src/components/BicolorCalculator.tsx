@@ -40,7 +40,7 @@ const BicolorCalculator = () => {
     direction: 'desc' 
   });
 
-  const { data: marketData, isLoading: isLoadingMarket } = useQuery({
+  const { data: marketData, isLoading: isLoadingMarket, error: marketError } = useQuery({
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
@@ -51,7 +51,7 @@ const BicolorCalculator = () => {
     },
   });
 
-  const { data: currentListings, isLoading: isLoadingListings } = useQuery({
+  const { data: currentListings, isLoading: isLoadingListings, error: listingsError } = useQuery({
     queryKey: ["currentListings", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
@@ -127,7 +127,6 @@ const BicolorCalculator = () => {
           currentListingsCount
         });
         
-        // New score calculation: gilPerGem / (currentListings / saleVelocity)
         const score = currentListingsCount > 0 && saleVelocity > 0
           ? Math.round(gilPerGem / (currentListingsCount / saleVelocity))
           : 0;
@@ -197,6 +196,27 @@ const BicolorCalculator = () => {
     </Button>
   );
 
+  const isLoading = isLoadingMarket || isLoadingListings;
+  const error = marketError || listingsError;
+
+  if (error) {
+    console.error("Error loading data:", error);
+    return (
+      <Card className="w-full max-w-4xl mx-auto bg-ffxiv-blue text-white">
+        <CardHeader>
+          <CardTitle className="text-ffxiv-gold text-2xl text-center">
+            Error Loading Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-red-400">
+            Failed to load market data. Please try again later.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-4xl mx-auto bg-ffxiv-blue text-white">
       <CardHeader>
@@ -219,7 +239,7 @@ const BicolorCalculator = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoadingMarket || isLoadingListings ? (
+        {isLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-ffxiv-gold" />
           </div>
