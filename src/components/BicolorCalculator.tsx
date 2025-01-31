@@ -63,6 +63,9 @@ const BicolorCalculator = () => {
   });
 
   const calculatePrices = (): PriceCalculation[] => {
+    console.log("Starting calculatePrices with marketData:", marketData);
+    console.log("and currentListings:", currentListings);
+
     if (!marketData || !currentListings?.results) {
       console.log("No market data or current listings available yet");
       return [];
@@ -70,8 +73,12 @@ const BicolorCalculator = () => {
 
     return bicolorItems
       .map((item) => {
+        console.log(`Processing item ${item.name} (ID: ${item.id})`);
         const itemMarketData = marketData.items[item.id];
         const currentListingData = currentListings.results.find(r => r.itemId === item.id);
+        
+        console.log(`Market data for item ${item.id}:`, itemMarketData);
+        console.log(`Current listing data for item ${item.id}:`, currentListingData);
         
         if (!itemMarketData || !itemMarketData.entries) {
           console.log(`No market data found for ${item.name} (ID: ${item.id})`);
@@ -113,10 +120,19 @@ const BicolorCalculator = () => {
         const saleVelocity = itemMarketData.regularSaleVelocity || 0;
         const currentListingsCount = currentListingData?.nq?.minListing?.world?.price ? 1 : 0;
         
+        console.log(`Calculated values for ${item.name}:`, {
+          averagePrice,
+          gilPerGem,
+          saleVelocity,
+          currentListingsCount
+        });
+        
         // New score calculation: gilPerGem / (currentListings / saleVelocity)
         const score = currentListingsCount > 0 && saleVelocity > 0
           ? Math.round(gilPerGem / (currentListingsCount / saleVelocity))
           : 0;
+
+        console.log(`Final score for ${item.name}: ${score}`);
 
         return {
           itemId: item.id,
