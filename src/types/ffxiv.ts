@@ -56,8 +56,8 @@ export interface ItemListings {
 }
 
 export interface CurrentListingsResponse {
-  itemIDs: number[];
   items: { [key: string]: ItemListings };
+  worldName: string;
 }
 
 export interface PriceCalculation {

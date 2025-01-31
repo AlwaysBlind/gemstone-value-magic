@@ -9,7 +9,7 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
 export const fetchCurrentListings = async (worldName: string, itemIds: number[]) => {
   const chunks = chunkArray(itemIds, 60);
   
-  let mergedData = {
+  let mergedData: CurrentListingsResponse = {
     items: {},
     worldName: worldName
   };
