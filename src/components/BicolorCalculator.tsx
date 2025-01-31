@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Loader2, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 const servers = ["Twintania", "Phoenix", "Odin", "Lich", "Zodiark", "Ragnarok", "Cerberus", "Spriggan", "Alpha", "Raiden"];
 
@@ -39,16 +40,51 @@ const BicolorCalculator = () => {
     key: 'gilPerGem', 
     direction: 'desc' 
   });
+  const { toast } = useToast();
 
-  const { data: marketData, isLoading } = useQuery({
+  const { data: marketData, isLoading, error } = useQuery({
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
-      const itemIds = bicolorItems.map((item) => item.id).reverse();
-      console.log("Fetching market data for items:", itemIds);
-      const data = await fetchMarketData(selectedServer, itemIds);
-      console.log("Raw market data received:", data);
-      return data;
+      const itemIds = bicolorItems.map((item) => item.id);
+      console.log(`Fetching market data for ${itemIds.length} items on ${selectedServer}`);
+      
+      try {
+        const data = await fetchMarketData(selectedServer, itemIds);
+        console.log("Market data response received:", {
+          worldName: data.worldName,
+          itemCount: Object.keys(data.items).length,
+          timestamp: new Date().toISOString()
+        });
+        
+        // Log items with no market data
+        itemIds.forEach(id => {
+          const item = bicolorItems.find(i => i.id === id);
+          const marketInfo = data.items[id];
+          
+          if (!marketInfo || !marketInfo.entries) {
+            console.log(`No market data available for ${item?.name} (ID: ${id})`);
+          } else if (marketInfo.entries.length === 0) {
+            console.log(`No sales history for ${item?.name} (ID: ${id})`);
+          } else {
+            console.log(`Found ${marketInfo.entries.length} sales for ${item?.name} (ID: ${id})`);
+            console.log(`Latest sale: ${marketInfo.entries[0].pricePerUnit} gil (${marketInfo.entries[0].quantity} units)`);
+          }
+        });
+
+        return data;
+      } catch (err) {
+        console.error("Error fetching market data:", err);
+        toast({
+          title: "Error fetching market data",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+        throw err;
+      }
     },
+    refetchOnWindowFocus: false,
+    staleTime: 5 * 60 * 1000, // Consider data stale after 5 minutes
+    retry: 2,
   });
 
   const calculatePrices = (): PriceCalculation[] => {
@@ -150,6 +186,18 @@ const BicolorCalculator = () => {
     </Button>
   );
 
+  if (error) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto bg-ffxiv-blue text-white">
+        <CardContent className="p-6">
+          <div className="text-center text-red-400">
+            Failed to load market data. Please try again later.
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full max-w-4xl mx-auto bg-ffxiv-blue text-white">
       <CardHeader>
@@ -233,6 +281,3 @@ const BicolorCalculator = () => {
       </CardContent>
     </Card>
   );
-};
-
-export default BicolorCalculator;
