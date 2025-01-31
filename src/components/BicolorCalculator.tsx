@@ -36,7 +36,7 @@ type SortConfig = {
 const BicolorCalculator = () => {
   const [selectedServer, setSelectedServer] = useState("Twintania");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ 
-    key: 'score', 
+    key: 'gilPerGem', 
     direction: 'desc' 
   });
 
@@ -65,10 +65,9 @@ const BicolorCalculator = () => {
             itemId: item.id,
             name: item.name,
             cost: item.cost,
-            marketPrice: -1,
+            marketPrice: -1, // Use -1 to indicate no data available
             gilPerGem: 0,
             saleVelocity: 0,
-            score: 0,
           };
         }
         
@@ -79,10 +78,9 @@ const BicolorCalculator = () => {
             itemId: item.id,
             name: item.name,
             cost: item.cost,
-            marketPrice: 0,
+            marketPrice: 0, // Use 0 to indicate no sales
             gilPerGem: 0,
             saleVelocity: 0,
-            score: 0,
           };
         }
         
@@ -95,17 +93,14 @@ const BicolorCalculator = () => {
         });
         
         const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
-        const gilPerGem = Math.round(averagePrice / item.cost);
-        const saleVelocity = itemMarketData.regularSaleVelocity || 0;
 
         return {
           itemId: item.id,
           name: item.name,
           cost: item.cost,
           marketPrice: averagePrice,
-          gilPerGem: gilPerGem,
-          saleVelocity: saleVelocity,
-          score: Math.round(gilPerGem * saleVelocity),
+          gilPerGem: Math.round(averagePrice / item.cost),
+          saleVelocity: itemMarketData.regularSaleVelocity || 0,
         };
       });
   };
@@ -143,11 +138,6 @@ const BicolorCalculator = () => {
   const formatGilPerGem = (calculation: PriceCalculation): string => {
     if (calculation.marketPrice <= 0) return "-";
     return `${formatNumber(Math.round(calculation.gilPerGem))} gil`;
-  };
-
-  const formatScore = (calculation: PriceCalculation): string => {
-    if (calculation.marketPrice <= 0) return "-";
-    return formatNumber(calculation.score);
   };
 
   const SortButton = ({ column }: { column: keyof PriceCalculation }) => (
@@ -210,10 +200,6 @@ const BicolorCalculator = () => {
                   Sale Velocity
                   <SortButton column="saleVelocity" />
                 </TableHead>
-                <TableHead className="text-ffxiv-gold text-right">
-                  Score
-                  <SortButton column="score" />
-                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -238,9 +224,6 @@ const BicolorCalculator = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     {calc.saleVelocity.toFixed(1)}/day
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatScore(calc)}
                   </TableCell>
                 </TableRow>
               ))}
