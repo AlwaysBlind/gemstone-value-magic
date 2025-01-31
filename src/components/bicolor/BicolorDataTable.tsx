@@ -40,8 +40,8 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
     <div className="flex items-center gap-1">
       {label}
       <Tooltip>
-        <TooltipTrigger>
-          <HelpCircle className="h-4 w-4 text-ffxiv-gold/70" />
+        <TooltipTrigger asChild>
+          <HelpCircle className="h-3.5 w-3.5 text-ffxiv-gold/40 hover:text-ffxiv-gold/70 transition-colors cursor-help" />
         </TooltipTrigger>
         <TooltipContent>
           <p className="max-w-xs">{tooltip}</p>
