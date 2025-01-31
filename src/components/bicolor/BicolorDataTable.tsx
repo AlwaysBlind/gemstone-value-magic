@@ -7,9 +7,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, HelpCircle } from "lucide-react";
 import { PriceCalculation } from "../../types/ffxiv";
 import { formatNumber, formatMarketPrice, formatGilPerGem, formatScore } from "../../utils/formatting";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface BicolorDataTableProps {
   calculations: PriceCalculation[];
@@ -31,36 +36,71 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
     </Button>
   );
 
+  const HeaderWithTooltip = ({ label, tooltip }: { label: string; tooltip: string }) => (
+    <div className="flex items-center gap-1">
+      {label}
+      <Tooltip>
+        <TooltipTrigger>
+          <HelpCircle className="h-4 w-4 text-ffxiv-gold/70" />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p className="max-w-xs">{tooltip}</p>
+        </TooltipContent>
+      </Tooltip>
+    </div>
+  );
+
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="text-ffxiv-gold">
-            Item
+            <HeaderWithTooltip 
+              label="Item" 
+              tooltip="The name of the item that can be purchased with Bicolor Gemstones" 
+            />
             <SortButton column="name" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Cost (Gems)
+            <HeaderWithTooltip 
+              label="Cost (Gems)" 
+              tooltip="The number of Bicolor Gemstones required to purchase this item" 
+            />
             <SortButton column="cost" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Market Price
+            <HeaderWithTooltip 
+              label="Market Price" 
+              tooltip="The current average market price for this item on your selected server" 
+            />
             <SortButton column="marketPrice" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Gil per Gem
+            <HeaderWithTooltip 
+              label="Gil per Gem" 
+              tooltip="The amount of gil you can expect to earn per Bicolor Gemstone spent" 
+            />
             <SortButton column="gilPerGem" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Sale Velocity
+            <HeaderWithTooltip 
+              label="Sale Velocity" 
+              tooltip="The average number of items sold per day over the last week" 
+            />
             <SortButton column="saleVelocity" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Current Listings
+            <HeaderWithTooltip 
+              label="Current Listings" 
+              tooltip="The number of items currently listed on the market board" 
+            />
             <SortButton column="currentListings" />
           </TableHead>
           <TableHead className="text-ffxiv-gold text-right">
-            Score
+            <HeaderWithTooltip 
+              label="Score" 
+              tooltip="A calculated score based on price and sale velocity - higher is better" 
+            />
             <SortButton column="score" />
           </TableHead>
         </TableRow>
