@@ -30,13 +30,13 @@ export const fetchMarketData = async (worldName: string, itemIds: number[]) => {
       })
     );
     
-    // Merge all chunk responses into a single response
+    // Initialize merged data with empty items object
     const mergedData = responses.reduce((acc, curr) => {
       return {
         items: { ...acc.items, ...curr.items },
         worldName: curr.worldName,
       };
-    });
+    }, { items: {}, worldName: worldName });
     
     console.log("Successfully merged all chunk responses");
     return mergedData;
