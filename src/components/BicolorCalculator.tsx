@@ -127,9 +127,13 @@ const BicolorCalculator = () => {
           currentListingsCount
         });
         
-        const score = currentListingsCount > 0 && saleVelocity > 0
-          ? Math.round(gilPerGem / (currentListingsCount / saleVelocity))
-          : 0;
+        // Modified score calculation
+        let score;
+        if (currentListingsCount === 0 || saleVelocity === 0) {
+          score = gilPerGem; // Return just the gil per gem when either value is 0
+        } else {
+          score = Math.round(gilPerGem / (currentListingsCount / saleVelocity));
+        }
 
         console.log(`Final score for ${item.name}: ${score}`);
 
