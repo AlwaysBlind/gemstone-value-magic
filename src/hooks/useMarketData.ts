@@ -73,11 +73,9 @@ export const useMarketData = (selectedServer: string) => {
 
       // New score calculation logic
       let score = 0;
-      if (currentListingsCount > 0) {
-        const velocityToListingsRatio = saleVelocity / currentListingsCount;
-        if (velocityToListingsRatio > 2 && saleVelocity > 1) {
-          score = gilPerGem;
-        }
+      const velocityToListingsRatio = saleVelocity / (currentListingsCount + 1);
+      if (velocityToListingsRatio >= 1) {
+        score = gilPerGem;
       }
 
       return {
