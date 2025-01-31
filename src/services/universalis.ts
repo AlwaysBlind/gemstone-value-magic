@@ -6,10 +6,24 @@ const chunkArray = <T>(array: T[], size: number): T[][] => {
   return chunks;
 };
 
+export const fetchCurrentListings = async (worldName: string, itemIds: number[]) => {
+  console.log("Fetching current listings for world:", worldName, "items:", itemIds);
+  const response = await fetch(
+    `https://universalis.app/api/v2/${worldName}/${itemIds.join(",")}`
+  );
+  
+  if (!response.ok) {
+    throw new Error("Failed to fetch current listings");
+  }
+  
+  const data = await response.json();
+  console.log("Current listings data received:", data);
+  return data;
+};
+
 export const fetchMarketData = async (worldName: string, itemIds: number[]) => {
   console.log("Fetching market history data for world:", worldName, "items:", itemIds);
   
-  // Split itemIds into chunks of 60
   const chunks = chunkArray(itemIds, 60);
   console.log("Split items into chunks:", chunks.length, "chunks");
   
@@ -18,7 +32,6 @@ export const fetchMarketData = async (worldName: string, itemIds: number[]) => {
     worldName: worldName
   };
   
-  // Process each chunk sequentially
   for (let i = 0; i < chunks.length; i++) {
     const chunk = chunks[i];
     console.log(`Processing chunk ${i + 1}/${chunks.length}, items:`, chunk);
@@ -34,7 +47,6 @@ export const fetchMarketData = async (worldName: string, itemIds: number[]) => {
     const chunkData = await response.json();
     console.log(`Received data for chunk ${i + 1}:`, chunkData);
     
-    // Merge chunk data into the combined result
     mergedData.items = { ...mergedData.items, ...chunkData.items };
   }
   

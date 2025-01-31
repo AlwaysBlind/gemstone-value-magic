@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { bicolorItems } from "../data/bicolorItems";
-import { fetchMarketData } from "../services/universalis";
+import { fetchMarketData, fetchCurrentListings } from "../services/universalis";
 import { PriceCalculation } from "../types/ffxiv";
 import {
   Table,
@@ -40,7 +40,7 @@ const BicolorCalculator = () => {
     direction: 'desc' 
   });
 
-  const { data: marketData, isLoading } = useQuery({
+  const { data: marketData, isLoading: isLoadingMarket } = useQuery({
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
@@ -51,16 +51,24 @@ const BicolorCalculator = () => {
     },
   });
 
+  const { data: currentListings, isLoading: isLoadingListings } = useQuery({
+    queryKey: ["currentListings", selectedServer],
+    queryFn: async () => {
+      const itemIds = bicolorItems.map((item) => item.id);
+      return fetchCurrentListings(selectedServer, itemIds);
+    },
+  });
+
   const calculatePrices = (): PriceCalculation[] => {
-    if (!marketData) return [];
+    if (!marketData || !currentListings) return [];
 
     return bicolorItems
       .map((item) => {
         const itemMarketData = marketData.items[item.id];
+        const currentListingData = currentListings.results.find(r => r.itemId === item.id);
         
         if (!itemMarketData || !itemMarketData.entries) {
           console.log(`No market data found for ${item.name} (ID: ${item.id})`);
-          console.log('Market data object:', itemMarketData);
           return {
             itemId: item.id,
             name: item.name,
@@ -97,6 +105,12 @@ const BicolorCalculator = () => {
         const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
         const gilPerGem = Math.round(averagePrice / item.cost);
         const saleVelocity = itemMarketData.regularSaleVelocity || 0;
+        const currentListingsCount = currentListingData?.nq?.minListing?.world?.price ? 1 : 0;
+        
+        // New score calculation: gilPerGem / (currentListings / saleVelocity)
+        const score = currentListingsCount > 0 && saleVelocity > 0
+          ? Math.round(gilPerGem / (currentListingsCount / saleVelocity))
+          : 0;
 
         return {
           itemId: item.id,
@@ -105,7 +119,8 @@ const BicolorCalculator = () => {
           marketPrice: averagePrice,
           gilPerGem: gilPerGem,
           saleVelocity: saleVelocity,
-          score: Math.round(gilPerGem * saleVelocity)
+          currentListings: currentListingsCount,
+          score: score
         };
       });
   };
@@ -182,7 +197,7 @@ const BicolorCalculator = () => {
         </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? (
+        {isLoadingMarket || isLoadingListings ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-ffxiv-gold" />
           </div>
@@ -209,6 +224,10 @@ const BicolorCalculator = () => {
                 <TableHead className="text-ffxiv-gold text-right">
                   Sale Velocity
                   <SortButton column="saleVelocity" />
+                </TableHead>
+                <TableHead className="text-ffxiv-gold text-right">
+                  Current Listings
+                  <SortButton column="currentListings" />
                 </TableHead>
                 <TableHead className="text-ffxiv-gold text-right">
                   Score
@@ -238,6 +257,9 @@ const BicolorCalculator = () => {
                   </TableCell>
                   <TableCell className="text-right">
                     {calc.saleVelocity.toFixed(1)}/day
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {calc.currentListings || 0}
                   </TableCell>
                   <TableCell className="text-right">
                     {formatScore(calc)}

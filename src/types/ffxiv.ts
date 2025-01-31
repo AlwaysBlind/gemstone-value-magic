@@ -28,6 +28,20 @@ export interface MarketHistoryResponse {
   worldName: string;
 }
 
+export interface CurrentListingsResponse {
+  results: {
+    itemId: number;
+    nq: {
+      minListing: {
+        world: { price: number };
+      };
+      dailySaleVelocity: {
+        world: { quantity: number };
+      };
+    };
+  }[];
+}
+
 export interface PriceCalculation {
   itemId: number;
   name: string;
@@ -36,4 +50,5 @@ export interface PriceCalculation {
   gilPerGem: number;
   saleVelocity: number;
   score: number;
+  currentListings?: number;
 }
