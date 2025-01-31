@@ -99,7 +99,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           <TableHead className="text-ffxiv-gold text-right">
             <HeaderWithTooltip 
               label="Score" 
-              tooltip="A calculated score based on price and sale velocity - higher is better" 
+              tooltip="A calculated score that helps identify profitable items. The score is based on the Gil per Gem value, but only applies when the Sale Velocity is higher than the Current Listings (indicating high demand). Items with a score of 0 either have low demand or too many listings. A higher score suggests a better market opportunity." 
             />
             <SortButton column="score" />
           </TableHead>
