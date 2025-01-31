@@ -8,9 +8,7 @@ export const useMarketData = (selectedServer: string) => {
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
-      console.log("Fetching market data for items:", itemIds);
       const data = await fetchMarketData(selectedServer, itemIds);
-      console.log("Raw market data received:", data);
       return data;
     },
   });
@@ -19,34 +17,23 @@ export const useMarketData = (selectedServer: string) => {
     queryKey: ["currentListings", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
-      console.log("Fetching current listings for items:", itemIds);
       const data = await fetchCurrentListings(selectedServer, itemIds);
-      console.log("Current listings data received:", data);
       return data;
     },
   });
 
   const calculatePrices = (): PriceCalculation[] => {
-    console.log("Starting calculatePrices with marketData:", marketData);
-    console.log("and currentListings:", currentListings);
-
     if (!marketData || !currentListings?.results) {
-      console.log("No market data or current listings available yet");
       return [];
     }
 
     return bicolorItems.map((item) => {
-      console.log(`Processing item ${item.name} (ID: ${item.id})`);
       const itemMarketData = marketData.items[item.id];
       const currentListingData = currentListings.results.find(
         (r) => r.itemId === item.id
       );
 
-      console.log(`Market data for item ${item.id}:`, itemMarketData);
-      console.log(`Current listing data for item ${item.id}:`, currentListingData);
-
       if (!itemMarketData || !itemMarketData.entries) {
-        console.log(`No market data found for ${item.name} (ID: ${item.id})`);
         return {
           itemId: item.id,
           name: item.name,
@@ -60,7 +47,6 @@ export const useMarketData = (selectedServer: string) => {
 
       const recentSales = itemMarketData.entries;
       if (recentSales.length === 0) {
-        console.log(`No sales history found for ${item.name} (ID: ${item.id})`);
         return {
           itemId: item.id,
           name: item.name,
@@ -88,13 +74,6 @@ export const useMarketData = (selectedServer: string) => {
         ? 1
         : 0;
 
-      console.log(`Calculated values for ${item.name}:`, {
-        averagePrice,
-        gilPerGem,
-        saleVelocity,
-        currentListingsCount,
-      });
-
       let score;
       if (
         currentListingsCount === null ||
@@ -108,8 +87,6 @@ export const useMarketData = (selectedServer: string) => {
       } else {
         score = Math.round(gilPerGem / (currentListingsCount / saleVelocity));
       }
-
-      console.log(`Final score for ${item.name}: ${score}`);
 
       return {
         itemId: item.id,
