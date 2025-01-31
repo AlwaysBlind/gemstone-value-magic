@@ -18,6 +18,7 @@ export const useMarketData = (selectedServer: string) => {
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
       const data = await fetchCurrentListings(selectedServer, itemIds);
+      console.log("Current listings response:", data);
       return data;
     },
   });
