@@ -55,12 +55,18 @@ const BicolorCalculator = () => {
     queryKey: ["currentListings", selectedServer],
     queryFn: async () => {
       const itemIds = bicolorItems.map((item) => item.id);
-      return fetchCurrentListings(selectedServer, itemIds);
+      console.log("Fetching current listings for items:", itemIds);
+      const data = await fetchCurrentListings(selectedServer, itemIds);
+      console.log("Current listings data received:", data);
+      return data;
     },
   });
 
   const calculatePrices = (): PriceCalculation[] => {
-    if (!marketData || !currentListings) return [];
+    if (!marketData || !currentListings?.results) {
+      console.log("No market data or current listings available yet");
+      return [];
+    }
 
     return bicolorItems
       .map((item) => {
