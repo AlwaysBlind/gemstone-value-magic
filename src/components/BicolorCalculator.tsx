@@ -127,10 +127,12 @@ const BicolorCalculator = () => {
           currentListingsCount
         });
         
-        // Modified score calculation
+        // Modified score calculation with null/undefined checks
         let score;
-        if (currentListingsCount === 0 || saleVelocity === 0) {
-          score = gilPerGem; // Return just the gil per gem when either value is 0
+        if (currentListingsCount === null || currentListingsCount === undefined || 
+            saleVelocity === null || saleVelocity === undefined || 
+            currentListingsCount === 0 || saleVelocity === 0) {
+          score = gilPerGem; // Return just the gil per gem when either value is null/undefined/0
         } else {
           score = Math.round(gilPerGem / (currentListingsCount / saleVelocity));
         }
