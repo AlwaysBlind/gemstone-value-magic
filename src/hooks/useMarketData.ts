@@ -71,18 +71,13 @@ export const useMarketData = (selectedServer: string) => {
       const saleVelocity = itemMarketData.regularSaleVelocity || 0;
       const currentListingsCount = currentListingData?.listings?.length || 0;
 
-      let score;
-      if (
-        currentListingsCount === null ||
-        currentListingsCount === undefined ||
-        saleVelocity === null ||
-        saleVelocity === undefined ||
-        currentListingsCount === 0 ||
-        saleVelocity === 0
-      ) {
-        score = gilPerGem;
-      } else {
-        score = Math.round(gilPerGem / (currentListingsCount / saleVelocity));
+      // New score calculation logic
+      let score = 0;
+      if (currentListingsCount > 0) {
+        const velocityToListingsRatio = saleVelocity / currentListingsCount;
+        if (velocityToListingsRatio > 2 && saleVelocity > 35) {
+          score = gilPerGem;
+        }
       }
 
       return {
