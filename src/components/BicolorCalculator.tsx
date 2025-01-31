@@ -43,7 +43,7 @@ const BicolorCalculator = () => {
   const { data: marketData, isLoading } = useQuery({
     queryKey: ["marketData", selectedServer],
     queryFn: async () => {
-      const itemIds = bicolorItems.map((item) => item.id);
+      const itemIds = bicolorItems.map((item) => item.id).reverse();
       console.log("Fetching market data for items:", itemIds);
       const data = await fetchMarketData(selectedServer, itemIds);
       console.log("Raw market data received:", data);
