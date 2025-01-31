@@ -28,18 +28,36 @@ export interface MarketHistoryResponse {
   worldName: string;
 }
 
+export interface Listing {
+  lastReviewTime: number;
+  pricePerUnit: number;
+  quantity: number;
+  stainID: number;
+  creatorName: string;
+  creatorID: null | string;
+  hq: boolean;
+  isCrafted: boolean;
+  listingID: string;
+  materia: any[];
+  onMannequin: boolean;
+  retainerCity: number;
+  retainerID: string;
+  retainerName: string;
+  sellerID: null | string;
+  total: number;
+  tax: number;
+}
+
+export interface ItemListings {
+  itemID: number;
+  worldID: number;
+  lastUploadTime: number;
+  listings: Listing[];
+}
+
 export interface CurrentListingsResponse {
-  results: {
-    itemId: number;
-    nq: {
-      minListing: {
-        world: { price: number };
-      };
-      dailySaleVelocity: {
-        world: { quantity: number };
-      };
-    };
-  }[];
+  itemIDs: number[];
+  items: { [key: string]: ItemListings };
 }
 
 export interface PriceCalculation {

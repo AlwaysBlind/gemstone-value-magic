@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchMarketData, fetchCurrentListings } from "../services/universalis";
 import { bicolorItems } from "../data/bicolorItems";
-import { PriceCalculation } from "../types/ffxiv";
+import { PriceCalculation, CurrentListingsResponse } from "../types/ffxiv";
 
 export const useMarketData = (selectedServer: string) => {
   const { data: marketData, isLoading: isLoadingMarket, error: marketError } = useQuery({
@@ -19,20 +19,18 @@ export const useMarketData = (selectedServer: string) => {
       const itemIds = bicolorItems.map((item) => item.id);
       const data = await fetchCurrentListings(selectedServer, itemIds);
       console.log("Current listings response:", data);
-      return data;
+      return data as CurrentListingsResponse;
     },
   });
 
   const calculatePrices = (): PriceCalculation[] => {
-    if (!marketData || !currentListings?.results) {
+    if (!marketData || !currentListings?.items) {
       return [];
     }
 
     return bicolorItems.map((item) => {
       const itemMarketData = marketData.items[item.id];
-      const currentListingData = currentListings.results.find(
-        (r) => r.itemId === item.id
-      );
+      const currentListingData = currentListings.items[item.id];
 
       if (!itemMarketData || !itemMarketData.entries) {
         return {
@@ -71,9 +69,7 @@ export const useMarketData = (selectedServer: string) => {
         totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
       const gilPerGem = Math.round(averagePrice / item.cost);
       const saleVelocity = itemMarketData.regularSaleVelocity || 0;
-      const currentListingsCount = currentListingData?.nq?.minListing?.world?.price
-        ? 1
-        : 0;
+      const currentListingsCount = currentListingData?.listings?.length || 0;
 
       let score;
       if (
