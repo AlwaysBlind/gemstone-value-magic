@@ -35,4 +35,5 @@ export interface PriceCalculation {
   marketPrice: number;
   gilPerGem: number;
   saleVelocity: number;
+  score: number;
 }
