@@ -72,7 +72,7 @@ export const useMarketData = (selectedServer: string) => {
         gilPerGem: gilPerGem,
         saleVelocity: saleVelocity,
         currentListings: totalListingsQuantity,
-        score: 0, // Will be calculated in the ranking phase
+        score: 4, // Starting with tier 4 as default
       };
     });
 
@@ -95,10 +95,10 @@ export const useMarketData = (selectedServer: string) => {
       return b.gilPerGem - a.gilPerGem;
     });
 
-    // Assign simple numerical ranks as scores
+    // Assign ranks starting from 4
     const rankedItems = sortedItems.map((item, index) => ({
       ...item,
-      score: index + 1
+      score: index + 4
     }));
 
     console.log('Final rankings summary:', 
