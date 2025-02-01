@@ -55,7 +55,6 @@ export const useMarketData = (selectedServer: string) => {
         totalQuantity += sale.quantity;
       });
 
-      // Calculate total quantity from all current listings
       const totalListingsQuantity = currentListingData?.listings?.reduce((sum, listing) => {
         return sum + listing.quantity;
       }, 0) || 0;
@@ -79,7 +78,7 @@ export const useMarketData = (selectedServer: string) => {
     // Filter out items with no market activity
     items = items.filter(item => item.gilPerGem > 0);
 
-    // Sort items based on gil per gem and velocity/listings ratio
+    // First step: Sort items based on gil per gem where velocity/listings ratio > 0.5
     const sortedItems = items.sort((a, b) => {
       const aRatio = (a.saleVelocity * 7) / a.currentListings;
       const bRatio = (b.saleVelocity * 7) / b.currentListings;
@@ -96,12 +95,20 @@ export const useMarketData = (selectedServer: string) => {
       return b.gilPerGem - a.gilPerGem;
     });
 
-    // Assign scores: top 15 qualifying items get their position as score, rest get 0
+    // Take top 15 items and apply new scoring formula
     const rankedItems = sortedItems.map((item, index) => {
-      const ratio = (item.saleVelocity * 7) / item.currentListings;
+      const weeklySalesVolume = item.saleVelocity * 7;
+      if (index < 15 && (weeklySalesVolume / item.currentListings > 0.5)) {
+        // New scoring formula: (gpg × weeklySalesVolume) / (listingCount / weeklySalesVolume)
+        const score = (item.gilPerGem * weeklySalesVolume) / (item.currentListings / weeklySalesVolume);
+        return {
+          ...item,
+          score: Math.round(score)
+        };
+      }
       return {
         ...item,
-        score: ratio > 0.5 && index < 15 ? index + 1 : 0
+        score: 0
       };
     });
 
@@ -112,7 +119,8 @@ export const useMarketData = (selectedServer: string) => {
         currentListings: item.currentListings,
         ratio: (item.saleVelocity * 7) / item.currentListings,
         gilPerGem: item.gilPerGem,
-        score: item.score
+        score: item.score,
+        weeklySales: item.saleVelocity * 7
       }))
     );
 
