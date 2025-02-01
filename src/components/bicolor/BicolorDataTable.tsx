@@ -7,6 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, HelpCircle } from "lucide-react";
 import { PriceCalculation } from "../../types/ffxiv";
 import { formatNumber, formatMarketPrice, formatGilPerGem, formatScore } from "../../utils/formatting";
@@ -57,6 +58,19 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
     return "bg-red-950/30 hover:bg-red-950/40";
   };
 
+  const getMarketSaturationBadge = (saleVelocity: number) => {
+    if (saleVelocity > 100) {
+      return <Badge className="bg-emerald-600 hover:bg-emerald-700">High Volume</Badge>;
+    }
+    if (saleVelocity >= 10) {
+      return <Badge className="bg-blue-600 hover:bg-blue-700">Good Volume</Badge>;
+    }
+    if (saleVelocity >= 1) {
+      return <Badge className="bg-amber-600 hover:bg-amber-700">Limited Volume</Badge>;
+    }
+    return <Badge className="bg-red-600 hover:bg-red-700">Very Limited</Badge>;
+  };
+
   return (
     <Table>
       <TableHeader>
@@ -92,7 +106,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           <TableHead className="text-ffxiv-gold text-right">
             <HeaderWithTooltip 
               label="Sale Velocity" 
-              tooltip="The average number of items sold per day over the last week" 
+              tooltip="The average number of items sold per day over the last week. The badge indicates how many items you can safely list before saturating the market." 
             />
             <SortButton column="saleVelocity" />
           </TableHead>
@@ -136,7 +150,10 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
               {formatGilPerGem(calc)}
             </TableCell>
             <TableCell className="text-right">
-              {calc.saleVelocity.toFixed(1)}/day
+              <div className="flex items-center justify-end gap-2">
+                <span>{calc.saleVelocity.toFixed(1)}/day</span>
+                {getMarketSaturationBadge(calc.saleVelocity)}
+              </div>
             </TableCell>
             <TableCell className="text-right">
               {calc.currentListings || 0}
