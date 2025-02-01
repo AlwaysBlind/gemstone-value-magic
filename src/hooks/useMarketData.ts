@@ -83,8 +83,8 @@ export const useMarketData = (selectedServer: string) => {
     // 1. Whether they meet the velocity requirement (sales velocity >= current listings)
     // 2. Their gil per gem value
     const sortedItems = items.sort((a, b) => {
-      const aQualifies = a.saleVelocity >= (a.currentListings + 1) ? 1 : 0;
-      const bQualifies = b.saleVelocity >= (b.currentListings + 1) ? 1 : 0;
+      const aQualifies = (a.saleVelocity * 4) >= (a.currentListings + 1) ? 1 : 0;
+      const bQualifies = (b.saleVelocity * 4) >= (b.currentListings + 1) ? 1 : 0;
 
       // If qualification status differs, prioritize qualified items
       if (aQualifies !== bQualifies) {
