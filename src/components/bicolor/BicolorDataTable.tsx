@@ -72,7 +72,28 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
   };
 
   return (
-    <Table>
+    <div>
+      <div className="mb-4 p-4 rounded bg-ffxiv-accent/20 text-sm">
+        <div className="font-medium text-ffxiv-gold mb-2">Row Color Guide:</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-emerald-950/20"></div>
+            <span>Quick Sales (Market Ratio &lt; 2)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-amber-950/20"></div>
+            <span>Medium Sales (Market Ratio 2-14)</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 rounded bg-red-950/20"></div>
+            <span>Slow Sales (Market Ratio &gt; 14)</span>
+          </div>
+        </div>
+        <div className="mt-2 text-xs text-ffxiv-gold/80">
+          Market Ratio = Current Listings ÷ Daily Sales
+        </div>
+      </div>
+      <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="text-ffxiv-gold">
@@ -164,7 +185,8 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           </TableRow>
         ))}
       </TableBody>
-    </Table>
+      </Table>
+    </div>
   );
 };
 
