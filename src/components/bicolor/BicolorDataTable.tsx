@@ -50,13 +50,6 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
     </div>
   );
 
-  const getSaleSpeedClass = (currentListings: number, saleVelocity: number) => {
-    const ratio = currentListings / saleVelocity;
-    if (ratio < 2) return "bg-emerald-950/30 hover:bg-emerald-950/40";
-    if (ratio >= 2 && ratio <= 14) return "bg-amber-950/30 hover:bg-amber-950/40";
-    return "bg-red-950/30 hover:bg-red-950/40";
-  };
-
   return (
     <Table>
       <TableHeader>
@@ -114,10 +107,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
       </TableHeader>
       <TableBody>
         {calculations.map((calc) => (
-          <TableRow 
-            key={calc.itemId}
-            className={getSaleSpeedClass(calc.currentListings || 1, calc.saleVelocity)}
-          >
+          <TableRow key={calc.itemId}>
             <TableCell className="font-medium">
               <a
                 href={`https://universalis.app/market/${calc.itemId}`}
