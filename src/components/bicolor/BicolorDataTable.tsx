@@ -53,22 +53,22 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
 
   const getSaleSpeedClass = (currentListings: number, saleVelocity: number) => {
     const ratio = currentListings / saleVelocity;
-    if (ratio < 2) return "bg-emerald-950/30 hover:bg-emerald-950/40";
-    if (ratio >= 2 && ratio <= 14) return "bg-amber-950/30 hover:bg-amber-950/40";
-    return "bg-red-950/30 hover:bg-red-950/40";
+    if (ratio < 2) return "bg-emerald-950/20 hover:bg-emerald-950/30";
+    if (ratio >= 2 && ratio <= 14) return "bg-amber-950/20 hover:bg-amber-950/30";
+    return "bg-red-950/20 hover:bg-red-950/30";
   };
 
   const getMarketSaturationBadge = (saleVelocity: number) => {
     if (saleVelocity > 100) {
-      return <Badge className="bg-emerald-600 hover:bg-emerald-700">High Volume</Badge>;
+      return <Badge className="bg-ffxiv-blue text-ffxiv-gold hover:bg-ffxiv-accent">High Volume</Badge>;
     }
     if (saleVelocity >= 10) {
-      return <Badge className="bg-blue-600 hover:bg-blue-700">Good Volume</Badge>;
+      return <Badge className="bg-ffxiv-accent text-ffxiv-gold hover:bg-ffxiv-blue">Good Volume</Badge>;
     }
     if (saleVelocity >= 1) {
-      return <Badge className="bg-amber-600 hover:bg-amber-700">Limited Volume</Badge>;
+      return <Badge className="bg-ffxiv-gold/20 text-ffxiv-gold hover:bg-ffxiv-gold/30">Limited Volume</Badge>;
     }
-    return <Badge className="bg-red-600 hover:bg-red-700">Very Limited</Badge>;
+    return <Badge className="bg-red-900/50 text-ffxiv-gold hover:bg-red-900/70">Very Limited</Badge>;
   };
 
   return (
