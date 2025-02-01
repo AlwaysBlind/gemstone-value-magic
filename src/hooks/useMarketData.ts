@@ -67,7 +67,7 @@ export const useMarketData = (selectedServer: string) => {
         gilPerGem: gilPerGem,
         saleVelocity: saleVelocity,
         currentListings: currentListingsCount,
-        score: 0, // Initial score is 0
+        score: 0,
       };
     });
 
@@ -90,15 +90,15 @@ export const useMarketData = (selectedServer: string) => {
         return b.gilPerGem - a.gilPerGem;
       });
 
-      // Take top 15 items for this tier
-      const tierItems = sortedItems.slice(0, 15).map(item => ({
+      // Take top 5 items for this tier
+      const tierItems = sortedItems.slice(0, 5).map(item => ({
         ...item,
         score: item.gilPerGem * multiplier
       }));
 
       // Add items to ranked list and remove them from remaining items
       rankedItems.push(...tierItems);
-      remainingItems = sortedItems.slice(15);
+      remainingItems = sortedItems.slice(5);
 
       // Adjust tier and multiplier for next iteration
       tier *= 2;

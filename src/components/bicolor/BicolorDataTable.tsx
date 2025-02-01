@@ -50,8 +50,6 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
     </div>
   );
 
-  // ... keep existing code (table header and body)
-
   return (
     <Table>
       <TableHeader>
@@ -101,7 +99,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           <TableHead className="text-ffxiv-gold text-right">
             <HeaderWithTooltip 
               label="Score" 
-              tooltip="A sophisticated ranking system that evaluates items in tiers. Each tier considers items where (Sale Velocity × Tier) ≥ (Current Listings + 1). The top 15 items in each tier receive a score based on their Gil per Gem value, multiplied by a tier-specific factor. Higher tiers have larger multipliers, ensuring the most profitable and fast-selling items appear at the top when sorted." 
+              tooltip="A sophisticated ranking system that evaluates items in tiers. Each tier considers items where (Sale Velocity × Tier) ≥ (Current Listings + 1). The top 5 items in each tier receive a score based on their Gil per Gem value, multiplied by a tier-specific factor. Higher tiers have larger multipliers, ensuring the most profitable and fast-selling items appear at the top when sorted." 
             />
             <SortButton column="score" />
           </TableHead>
