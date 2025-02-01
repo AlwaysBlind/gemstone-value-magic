@@ -71,7 +71,7 @@ export const useMarketData = (selectedServer: string) => {
         marketPrice: averagePrice,
         gilPerGem: gilPerGem,
         saleVelocity: saleVelocity,
-        currentListings: totalListingsQuantity,
+        currentListings: totalListingsQuantity || 1, // Prevent division by zero
         score: 0, // Will be calculated in the ranking phase
       };
     });
@@ -79,33 +79,38 @@ export const useMarketData = (selectedServer: string) => {
     // Filter out items with no market activity
     items = items.filter(item => item.gilPerGem > 0);
 
-    // Sort items based on two criteria:
-    // 1. Whether they meet the velocity requirement (sales velocity >= current listings)
-    // 2. Their gil per gem value
+    // Sort items based on gil per gem and velocity/listings ratio
     const sortedItems = items.sort((a, b) => {
-      const aQualifies = (a.saleVelocity * 4) >= (a.currentListings + 1) ? 1 : 0;
-      const bQualifies = (b.saleVelocity * 4) >= (b.currentListings + 1) ? 1 : 0;
-
-      // If qualification status differs, prioritize qualified items
-      if (aQualifies !== bQualifies) {
-        return bQualifies - aQualifies;
-      }
+      const aRatio = (a.saleVelocity * 7) / a.currentListings;
+      const bRatio = (b.saleVelocity * 7) / b.currentListings;
       
-      // If both items have the same qualification status, sort by gil per gem
+      // Only consider items where ratio > 0.5
+      const aQualifies = aRatio > 0.5;
+      const bQualifies = bRatio > 0.5;
+
+      if (aQualifies !== bQualifies) {
+        return bQualifies ? 1 : -1;
+      }
+
+      // If both qualify or both don't qualify, sort by gil per gem
       return b.gilPerGem - a.gilPerGem;
     });
 
-    // Assign simple numerical ranks as scores
-    const rankedItems = sortedItems.map((item, index) => ({
-      ...item,
-      score: index + 1
-    }));
+    // Assign scores: top 15 qualifying items get their position as score, rest get 0
+    const rankedItems = sortedItems.map((item, index) => {
+      const ratio = (item.saleVelocity * 7) / item.currentListings;
+      return {
+        ...item,
+        score: ratio > 0.5 && index < 15 ? index + 1 : 0
+      };
+    });
 
     console.log('Final rankings summary:', 
-      rankedItems.slice(0, 10).map(item => ({
+      rankedItems.slice(0, 15).map(item => ({
         name: item.name,
         saleVelocity: item.saleVelocity,
         currentListings: item.currentListings,
+        ratio: (item.saleVelocity * 7) / item.currentListings,
         gilPerGem: item.gilPerGem,
         score: item.score
       }))
