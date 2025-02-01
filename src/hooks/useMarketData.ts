@@ -99,12 +99,11 @@ export const useMarketData = (selectedServer: string) => {
     const rankedItems = sortedItems.map((item, index) => {
       const weeklySalesVolume = item.saleVelocity * 7;
       if (index < 15 && (weeklySalesVolume / item.currentListings > 0.5)) {
-        // New scoring formula: (gpg × weeklySalesVolume) / (listingCount / weeklySalesVolume) × (cost × saleVelocity)
-        const baseScore = (item.gilPerGem * weeklySalesVolume) / (item.currentListings / weeklySalesVolume);
-        const finalScore = baseScore * (item.cost * item.saleVelocity);
+        // New scoring formula: (gpg × weeklySalesVolume) / (listingCount / weeklySalesVolume)
+        const score = (item.gilPerGem * weeklySalesVolume) / (item.currentListings / weeklySalesVolume);
         return {
           ...item,
-          score: Math.round(finalScore)
+          score: Math.round(score)
         };
       }
       return {
@@ -121,8 +120,7 @@ export const useMarketData = (selectedServer: string) => {
         ratio: (item.saleVelocity * 7) / item.currentListings,
         gilPerGem: item.gilPerGem,
         score: item.score,
-        weeklySales: item.saleVelocity * 7,
-        cost: item.cost
+        weeklySales: item.saleVelocity * 7
       }))
     );
 
