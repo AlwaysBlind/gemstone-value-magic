@@ -15,7 +15,7 @@ const BicolorCalculator = () => {
   const [selectedServer, setSelectedServer] = useState("Twintania");
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: "score",
-    direction: "asc",
+    direction: "desc",
   });
 
   const { calculations, isLoading, error } = useMarketData(selectedServer);
