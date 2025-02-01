@@ -7,7 +7,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ArrowUpDown, HelpCircle } from "lucide-react";
 import { PriceCalculation } from "../../types/ffxiv";
 import { formatNumber, formatMarketPrice, formatGilPerGem, formatScore } from "../../utils/formatting";
@@ -53,47 +52,13 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
 
   const getSaleSpeedClass = (currentListings: number, saleVelocity: number) => {
     const ratio = currentListings / saleVelocity;
-    if (ratio < 2) return "bg-emerald-950/20 hover:bg-emerald-950/30";
-    if (ratio >= 2 && ratio <= 14) return "bg-amber-950/20 hover:bg-amber-950/30";
-    return "bg-red-950/20 hover:bg-red-950/30";
-  };
-
-  const getMarketSaturationBadge = (saleVelocity: number) => {
-    if (saleVelocity > 100) {
-      return <Badge className="bg-ffxiv-blue text-ffxiv-gold hover:bg-ffxiv-accent">High Volume</Badge>;
-    }
-    if (saleVelocity >= 10) {
-      return <Badge className="bg-ffxiv-accent text-ffxiv-gold hover:bg-ffxiv-blue">Good Volume</Badge>;
-    }
-    if (saleVelocity >= 1) {
-      return <Badge className="bg-ffxiv-gold/20 text-ffxiv-gold hover:bg-ffxiv-gold/30">Limited Volume</Badge>;
-    }
-    return <Badge className="bg-red-900/50 text-ffxiv-gold hover:bg-red-900/70">Very Limited</Badge>;
+    if (ratio < 2) return "bg-emerald-950/30 hover:bg-emerald-950/40";
+    if (ratio >= 2 && ratio <= 14) return "bg-amber-950/30 hover:bg-amber-950/40";
+    return "bg-red-950/30 hover:bg-red-950/40";
   };
 
   return (
-    <div>
-      <div className="mb-4 p-4 rounded bg-ffxiv-accent/20 text-sm">
-        <div className="font-medium text-ffxiv-gold mb-2">Row Color Guide:</div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-emerald-950/20"></div>
-            <span>Quick Sales (Market Ratio &lt; 2)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-amber-950/20"></div>
-            <span>Medium Sales (Market Ratio 2-14)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded bg-red-950/20"></div>
-            <span>Slow Sales (Market Ratio &gt; 14)</span>
-          </div>
-        </div>
-        <div className="mt-2 text-xs text-ffxiv-gold/80">
-          Market Ratio = Current Listings ÷ Daily Sales
-        </div>
-      </div>
-      <Table>
+    <Table>
       <TableHeader>
         <TableRow>
           <TableHead className="text-ffxiv-gold">
@@ -127,7 +92,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           <TableHead className="text-ffxiv-gold text-right">
             <HeaderWithTooltip 
               label="Sale Velocity" 
-              tooltip="The average number of items sold per day over the last week. The badge indicates how many items you can safely list before saturating the market." 
+              tooltip="The average number of items sold per day over the last week" 
             />
             <SortButton column="saleVelocity" />
           </TableHead>
@@ -171,10 +136,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
               {formatGilPerGem(calc)}
             </TableCell>
             <TableCell className="text-right">
-              <div className="flex items-center justify-end gap-2">
-                <span>{calc.saleVelocity.toFixed(1)}/day</span>
-                {getMarketSaturationBadge(calc.saleVelocity)}
-              </div>
+              {calc.saleVelocity.toFixed(1)}/day
             </TableCell>
             <TableCell className="text-right">
               {calc.currentListings || 0}
@@ -185,8 +147,7 @@ const BicolorDataTable = ({ calculations, sortConfig, onSort }: BicolorDataTable
           </TableRow>
         ))}
       </TableBody>
-      </Table>
-    </div>
+    </Table>
   );
 };
 
