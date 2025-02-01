@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { fetchMarketData, fetchCurrentListings } from "../services/universalis";
 import { bicolorItems } from "../data/bicolorItems";
 import { PriceCalculation, CurrentListingsResponse } from "../types/ffxiv";
@@ -23,7 +24,7 @@ export const useMarketData = (selectedServer: string) => {
     },
   });
 
-  const calculatePrices = (): PriceCalculation[] => {
+  const calculations = useMemo(() => {
     if (!marketData || !currentListings?.items) {
       return [];
     }
@@ -80,7 +81,7 @@ export const useMarketData = (selectedServer: string) => {
     let multiplier = 1000;
     let rankedItems: PriceCalculation[] = [];
 
-    while (remainingItems.length > 0) {
+    while (remainingItems.length > 0 && multiplier >= 1) {
       // Sort items based on velocity/listings ratio and gil per gem
       const sortedItems = remainingItems.sort((a, b) => {
         const aQualifies = (a.saleVelocity * tier) >= (a.currentListings + 1) ? 1 : 0;
@@ -105,12 +106,12 @@ export const useMarketData = (selectedServer: string) => {
       multiplier = Math.max(1, multiplier / 10);
     }
 
-    // Combine ranked items with any remaining unranked items
+    // Add any remaining items with score 0
     return [...rankedItems, ...remainingItems];
-  };
+  }, [marketData, currentListings]); // Only recalculate when these dependencies change
 
   return {
-    calculations: calculatePrices(),
+    calculations,
     isLoading: isLoadingMarket || isLoadingListings,
     error: marketError || listingsError,
   };
