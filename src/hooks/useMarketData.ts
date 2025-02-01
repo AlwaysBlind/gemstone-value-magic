@@ -79,62 +79,30 @@ export const useMarketData = (selectedServer: string) => {
     // Filter out items with no market activity
     items = items.filter(item => item.gilPerGem > 0);
 
-    // Initialize ranking variables
-    let remainingItems = [...items];
-    let tier = 1;
-    let multiplier = 1000;
-    let rankedItems: PriceCalculation[] = [];
+    // Sort items based on two criteria:
+    // 1. Whether they meet the velocity requirement (sales velocity >= current listings)
+    // 2. Their gil per gem value
+    const sortedItems = items.sort((a, b) => {
+      const aQualifies = a.saleVelocity >= (a.currentListings + 1) ? 1 : 0;
+      const bQualifies = b.saleVelocity >= (b.currentListings + 1) ? 1 : 0;
 
-    // Continue ranking while there are items and the multiplier is still significant
-    while (remainingItems.length > 0 && multiplier >= 1) {
-      console.log(`Processing tier ${tier} with ${remainingItems.length} items remaining`);
+      // If qualification status differs, prioritize qualified items
+      if (aQualifies !== bQualifies) {
+        return bQualifies - aQualifies;
+      }
       
-      // Sort items based on two criteria:
-      // 1. Whether they meet the tier's velocity requirement
-      // 2. Their gil per gem value
-      const sortedItems = remainingItems.sort((a, b) => {
-        const aQualifies = (a.saleVelocity * tier) >= (a.currentListings + 1) ? 1 : 0;
-        const bQualifies = (b.saleVelocity * tier) >= (b.currentListings + 1) ? 1 : 0;
+      // If both items have the same qualification status, sort by gil per gem
+      return b.gilPerGem - a.gilPerGem;
+    });
 
-        // If qualification status differs, prioritize qualified items
-        if (aQualifies !== bQualifies) {
-          return bQualifies - aQualifies;
-        }
-        
-        // If both items have the same qualification status, sort by gil per gem
-        return b.gilPerGem - a.gilPerGem;
-      });
+    // Assign simple numerical ranks as scores
+    const rankedItems = sortedItems.map((item, index) => ({
+      ...item,
+      score: index + 1
+    }));
 
-      // Take top 5 items for this tier and assign scores
-      const tierItems = sortedItems.slice(0, 5).map(item => ({
-        ...item,
-        score: Math.round(item.gilPerGem * multiplier)
-      }));
-
-      console.log(`Tier ${tier} selected items:`, 
-        tierItems.map(item => ({
-          name: item.name,
-          saleVelocity: item.saleVelocity,
-          currentListings: item.currentListings,
-          gilPerGem: item.gilPerGem,
-          score: item.score
-        }))
-      );
-
-      // Add items to ranked list and remove them from remaining items
-      rankedItems.push(...tierItems);
-      remainingItems = sortedItems.slice(5);
-
-      // Adjust tier and multiplier for next iteration
-      tier *= 2;
-      multiplier = Math.max(1, multiplier / 10);
-    }
-
-    // Add any remaining items with score 0
-    const finalResults = [...rankedItems, ...remainingItems];
-    
     console.log('Final rankings summary:', 
-      finalResults.slice(0, 10).map(item => ({
+      rankedItems.slice(0, 10).map(item => ({
         name: item.name,
         saleVelocity: item.saleVelocity,
         currentListings: item.currentListings,
@@ -143,8 +111,8 @@ export const useMarketData = (selectedServer: string) => {
       }))
     );
 
-    return finalResults;
-  }, [marketData, currentListings]); // Only recalculate when these dependencies change
+    return rankedItems;
+  }, [marketData, currentListings]);
 
   return {
     calculations,
