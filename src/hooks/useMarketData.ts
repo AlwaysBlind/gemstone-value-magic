@@ -55,10 +55,14 @@ export const useMarketData = (selectedServer: string) => {
         totalQuantity += sale.quantity;
       });
 
+      // Calculate total quantity from all current listings
+      const totalListingsQuantity = currentListingData?.listings?.reduce((sum, listing) => {
+        return sum + listing.quantity;
+      }, 0) || 0;
+
       const averagePrice = totalQuantity > 0 ? Math.round(totalPrice / totalQuantity) : 0;
       const gilPerGem = Math.round(averagePrice / item.cost);
       const saleVelocity = itemMarketData.regularSaleVelocity || 0;
-      const currentListingsCount = currentListingData?.listings?.length || 0;
 
       return {
         itemId: item.id,
@@ -67,7 +71,7 @@ export const useMarketData = (selectedServer: string) => {
         marketPrice: averagePrice,
         gilPerGem: gilPerGem,
         saleVelocity: saleVelocity,
-        currentListings: currentListingsCount,
+        currentListings: totalListingsQuantity,
         score: 0, // Will be calculated in the ranking phase
       };
     });
